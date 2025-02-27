@@ -26,12 +26,23 @@ class EmployeeAPITestCase(TestCase):
         self.detail_urls = lambda id: reverse('employees-detail', kwargs={"pk":id})
 
 
+    # Test for GET /employees
     def test_get_employee_list(self):
         print("get list_Employee")
         response = self.client.get(self.list_urls)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         employees = Employee.objects.all()
         self.assertEqual(employees.count(),2)
+
+    def test_get_employee_list_no_employees(self):
+        print("get list_Employee no employees")
+        e=Employee.objects.all()
+        e.delete()
+        print(e)
+        response = self.client.get(self.list_urls)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(e.count(), 0)
+    
         
     def test_post_employee(self):
         print("post employee")
@@ -50,7 +61,7 @@ class EmployeeAPITestCase(TestCase):
 
     def test_get_employee_detail(self):
         print("get detail_employee")
-        employee = Employee.objects.get(emp_id='e009')
+        employee = Employee.objects.get(emp_id='e009')  
         response = self.client.get(self.detail_urls(employee.pk))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['emp_name'], employee.emp_name)
